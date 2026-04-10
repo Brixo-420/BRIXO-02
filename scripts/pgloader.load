@@ -1,0 +1,30 @@
+-- Plantilla de pgloader para migrar MySQL -> PostgreSQL (Aiven)
+-- Uso:
+--   export MYSQL_URL='mysql://user:pass@host:3306/dbname'
+--   export PG_URL='postgresql://user:pass@host:25060/dbname?sslmode=require'
+--   envsubst < scripts/pgloader.load > /tmp/pgloader.generated.load
+--   pgloader /tmp/pgloader.generated.load
+
+LOAD DATABASE
+  FROM ${MYSQL_URL}
+  INTO ${PG_URL}
+
+WITH include drop,
+     create tables,
+     create indexes,
+     reset sequences,
+     data only,
+     workers = 4,
+     concurrency = 1,
+     prefetch rows = 50000,
+     batch rows = 1000,
+     on error stop
+
+SET PostgreSQL PARAMETERS
+    maintenance_work_mem to '256MB',
+    work_mem to '32MB';
+
+CAST type datetime to timestamptz drop default drop not null,
+     type date to date drop not null,
+     type tinyint when (= precision 1) to boolean using tinyint-to-boolean,
+     type bigint when unsigned to bigint;
