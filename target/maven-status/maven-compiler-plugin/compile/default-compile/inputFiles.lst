@@ -1,11 +1,14 @@
 c:\BRIXO-02\src\main\java\com\brixo\dto\MaterialDto.java
 c:\BRIXO-02\src\main\java\com\brixo\controller\HomeController.java
+c:\BRIXO-02\src\main\java\com\brixo\model\EstadoServicio.java
 c:\BRIXO-02\src\main\java\com\brixo\controller\AuthController.java
 c:\BRIXO-02\src\main\java\com\brixo\model\Contratista.java
+c:\BRIXO-02\src\main\java\com\brixo\controller\ServicioController.java
 c:\BRIXO-02\src\main\java\com\brixo\security\BrixoUserDetails.java
 c:\BRIXO-02\src\main\java\com\brixo\config\DataInitializer.java
 c:\BRIXO-02\src\main\java\com\brixo\model\Cliente.java
 c:\BRIXO-02\src\main\java\com\brixo\service\CotizadorService.java
+c:\BRIXO-02\src\main\java\com\brixo\service\ServicioService.java
 c:\BRIXO-02\src\main\java\com\brixo\model\Usuario.java
 c:\BRIXO-02\src\main\java\com\brixo\repository\ServicioRepository.java
 c:\BRIXO-02\src\main\java\com\brixo\repository\SolicitudRepository.java

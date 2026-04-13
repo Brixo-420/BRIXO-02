@@ -87,16 +87,16 @@ public class DataInitializer implements CommandLineRunner {
 
             if (reparacion != null) {
                 Servicio reparacionElectrica = new Servicio();
-                reparacionElectrica.setNombre("Reparación Eléctrica");
+                reparacionElectrica.setTitulo("Reparación Eléctrica");
                 reparacionElectrica.setDescripcion("Reparación y mantenimiento de sistemas eléctricos");
-                reparacionElectrica.setPrecioEstimado(new BigDecimal("100.00"));
+                reparacionElectrica.setPresupuesto(new BigDecimal("100.00"));
                 reparacionElectrica.setCategoria(reparacion);
                 servicioRepository.save(reparacionElectrica);
 
                 Servicio reparacionDaños = new Servicio();
-                reparacionDaños.setNombre("Reparación de Daños");
+                reparacionDaños.setTitulo("Reparación de Daños");
                 reparacionDaños.setDescripcion("Reparación de daños estructurales menores");
-                reparacionDaños.setPrecioEstimado(new BigDecimal("150.00"));
+                reparacionDaños.setPresupuesto(new BigDecimal("150.00"));
                 reparacionDaños.setCategoria(reparacion);
                 servicioRepository.save(reparacionDaños);
             }
