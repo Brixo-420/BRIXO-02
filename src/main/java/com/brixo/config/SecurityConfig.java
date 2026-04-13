@@ -1,8 +1,5 @@
 package com.brixo.config;
 
-
-//
-
 import com.brixo.security.BrixoUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

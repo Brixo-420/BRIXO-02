@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Chat – Brixo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/brixo.css}">
+    <style>
+        .chat-box { height: 60vh; overflow-y: auto; }
+        .msg-out { background-color: #0d6efd; color: white; }
+        .msg-in  { background-color: #f8f9fa; }
+    </style>
+</head>
+<body class="bg-light d-flex flex-column min-vh-100">
+    <div th:replace="~{fragments/layout :: navbar}"></div>
+
+    <div class="container py-4" style="max-width:700px">
+        <a th:href="@{/mensajes}" class="btn btn-sm btn-outline-secondary rounded-pill mb-3">
+            <i class="fas fa-arrow-left me-1"></i>Volver
+        </a>
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+            <div class="card-header bg-primary text-white py-3">
+                <h6 class="mb-0 fw-bold"><i class="fas fa-comments me-2"></i>Conversación</h6>
+            </div>
+            <div class="card-body chat-box p-3" id="chatBox">
+                <div th:each="m : ${mensajes}"
+                     th:class="${m.remitenteId == user.id and m.remitenteRol == user.rol}
+                                ? 'd-flex justify-content-end mb-2'
+                                : 'd-flex justify-content-start mb-2'">
+                    <div class="rounded-3 px-3 py-2 small"
+                         style="max-width:75%"
+                         th:classappend="${m.remitenteId == user.id and m.remitenteRol == user.rol}
+                                         ? ' msg-out' : ' msg-in'"
+                         th:text="${m.contenido}"></div>
+                </div>
+            </div>
+            <div class="card-footer bg-white border-top">
+                <form th:action="@{/mensajes/enviar}" method="post" class="d-flex gap-2">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <input type="hidden" name="destinatarioId"  th:value="${otherId}">
+                    <input type="hidden" name="destinatarioRol" th:value="${otherRol}">
+                    <input type="text" name="contenido" class="form-control rounded-pill"
+                           placeholder="Escribe un mensaje..." required autocomplete="off">
+                    <button type="submit" class="btn btn-primary rounded-pill px-3">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/layout :: footer}"></div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Scroll to bottom of chat
+        const box = document.getElementById('chatBox');
+        if (box) box.scrollTop = box.scrollHeight;
+    </script>
+</body>
+</html>

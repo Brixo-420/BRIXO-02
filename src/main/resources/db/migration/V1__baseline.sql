@@ -1,0 +1,8 @@
+-- Baseline inicial para PostgreSQL/Aiven.
+--
+-- Este archivo marca la versión inicial de Flyway.
+-- Si estás migrando una base existente (importada desde MySQL),
+-- Flyway registrará esta versión y luego podrás añadir scripts V2, V3, etc.
+--
+-- Si inicias desde cero, crea un script V2__init_schema.sql con el DDL completo
+-- antes de desplegar en producción con spring.jpa.hibernate.ddl-auto=validate.
