@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${categoriaSeleccionada != null} ? 'Especialidades – ' + ${categoriaSeleccionada.nombre} + ' · Brixo' : 'Especialidades – Brixo'">
+        Especialidades – Brixo
+    </title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/brixo.css}">
+    <link rel="icon" th:href="@{/favicon.svg}" type="image/svg+xml">
+
+    <style>
+        body { background: var(--neutral-50); }
+
+        .page-hero {
+            background: var(--neutral-900);
+            color: #fff;
+            padding: clamp(48px, 8vh, 80px) 0 clamp(32px, 5vh, 56px);
+        }
+        .page-hero__title {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-bottom: 12px;
+        }
+        .page-hero__sub {
+            font-size: 1.05rem;
+            opacity: 0.75;
+            max-width: 520px;
+        }
+
+        /* Category tabs */
+        .cat-tabs {
+            background: #fff;
+            border-bottom: 1px solid var(--neutral-200);
+            position: sticky;
+            top: 70px;
+            z-index: 10;
+        }
+        .cat-tabs__inner {
+            display: flex;
+            gap: 4px;
+            overflow-x: auto;
+            padding: 12px 0;
+            scrollbar-width: none;
+        }
+        .cat-tabs__inner::-webkit-scrollbar { display: none; }
+        .cat-tab {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: var(--radius-full);
+            font-size: 0.875rem;
+            font-weight: 600;
+            white-space: nowrap;
+            text-decoration: none;
+            color: var(--neutral-700);
+            border: 1.5px solid var(--neutral-200);
+            background: #fff;
+            transition: all 0.15s;
+        }
+        .cat-tab:hover { border-color: var(--primary-color); color: var(--primary-color); }
+        .cat-tab.active {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: #fff;
+        }
+
+        /* Service cards */
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .service-card {
+            background: #fff;
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            border: 1.5px solid var(--neutral-200);
+            transition: all 0.2s;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+        }
+        .service-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary-color);
+            color: inherit;
+        }
+        .service-card__img {
+            height: 180px;
+            overflow: hidden;
+            background: var(--neutral-100);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .service-card__img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+        .service-card:hover .service-card__img img { transform: scale(1.06); }
+        .service-card__img-placeholder {
+            font-size: 2.5rem;
+            color: var(--neutral-300);
+        }
+        .service-card__body { padding: 20px; flex: 1; }
+        .service-card__cat {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--primary-color);
+            margin-bottom: 6px;
+        }
+        .service-card__name {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--neutral-900);
+            margin-bottom: 8px;
+        }
+        .service-card__desc {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .service-card__footer {
+            padding: 14px 20px;
+            border-top: 1px solid var(--neutral-100);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .service-card__price {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--neutral-900);
+        }
+        .service-card__price small {
+            font-weight: 400;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+        .service-card__cta {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+        }
+        .empty-state__icon {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: var(--neutral-100);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: var(--neutral-400);
+            margin-bottom: 20px;
+        }
+        .empty-state h3 {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--neutral-900);
+            margin-bottom: 8px;
+        }
+        .empty-state p { color: var(--text-secondary); }
+
+        /* Category hero cards (when no filter selected) */
+        .cat-hero-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 16px;
+        }
+        .cat-hero-card {
+            background: #fff;
+            border: 1.5px solid var(--neutral-200);
+            border-radius: var(--radius-xl);
+            padding: 28px 20px;
+            text-align: center;
+            text-decoration: none;
+            color: var(--neutral-900);
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+        .cat-hero-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            color: var(--neutral-900);
+        }
+        .cat-hero-card__icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #E3F2FD;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            transition: transform 0.2s;
+        }
+        .cat-hero-card:hover .cat-hero-card__icon { transform: scale(1.1); }
+        .cat-hero-card__name { font-weight: 700; font-size: 0.95rem; }
+        .cat-hero-card__desc { font-size: 0.8rem; color: var(--text-secondary); }
+    </style>
+</head>
+
+<body>
+    <div th:replace="~{fragments/layout :: navbar(overlay=false)}"></div>
+
+    <!-- Page Hero -->
+    <section class="page-hero">
+        <div class="container" style="max-width:1200px">
+            <p class="mb-2" style="opacity:0.5;font-size:0.875rem">
+                <a th:href="@{/}" class="text-white text-decoration-none">Inicio</a>
+                <i class="fas fa-chevron-right mx-2" style="font-size:0.7rem"></i>
+                <span th:if="${categoriaSeleccionada == null}">Especialidades</span>
+                <span th:if="${categoriaSeleccionada != null}">
+                    <a th:href="@{/especialidades}" class="text-white text-decoration-none">Especialidades</a>
+                    <i class="fas fa-chevron-right mx-2" style="font-size:0.7rem"></i>
+                    <span th:text="${categoriaSeleccionada.nombre}"></span>
+                </span>
+            </p>
+            <h1 class="page-hero__title"
+                th:text="${categoriaSeleccionada != null} ? ${categoriaSeleccionada.nombre} : 'Todas las especialidades'">
+                Todas las especialidades
+            </h1>
+            <p class="page-hero__sub"
+               th:text="${categoriaSeleccionada != null and categoriaSeleccionada.descripcion != null} ? ${categoriaSeleccionada.descripcion} : 'Encuentra el servicio que necesitas entre nuestros profesionales verificados.'">
+                Encuentra el servicio que necesitas entre nuestros profesionales verificados.
+            </p>
+        </div>
+    </section>
+
+    <!-- Category tabs -->
+    <div class="cat-tabs" th:if="${not #lists.isEmpty(categorias)}">
+        <div class="container" style="max-width:1200px">
+            <div class="cat-tabs__inner">
+                <a th:href="@{/especialidades}"
+                   th:classappend="${categoriaSeleccionada == null} ? ' active' : ''"
+                   class="cat-tab">
+                    <i class="fas fa-th-large"></i> Todas
+                </a>
+                <a th:each="cat : ${categorias}"
+                   th:href="@{'/especialidades/categoria/' + ${cat.id}}"
+                   th:text="${cat.nombre}"
+                   th:classappend="${categoriaSeleccionada != null and categoriaSeleccionada.id == cat.id} ? ' active' : ''"
+                   class="cat-tab">Categoría</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <main style="padding: 40px 0 80px">
+        <div class="container" style="max-width:1200px">
+
+            <!-- Vista: todas las categorías (sin filtro) -->
+            <div th:if="${categoriaSeleccionada == null and not #lists.isEmpty(categorias)}">
+                <h2 style="font-size:1.1rem;font-weight:700;color:var(--neutral-900);margin-bottom:20px">
+                    Explora por categoría
+                </h2>
+                <div class="cat-hero-grid mb-5">
+                    <a th:each="cat : ${categorias}"
+                       th:href="@{'/especialidades/categoria/' + ${cat.id}}"
+                       class="cat-hero-card">
+                        <div class="cat-hero-card__icon">
+                            <i class="fas fa-tools"></i>
+                        </div>
+                        <span class="cat-hero-card__name" th:text="${cat.nombre}">Categoría</span>
+                        <span class="cat-hero-card__desc"
+                              th:text="${cat.descripcion != null} ? ${cat.descripcion} : 'Ver servicios disponibles'">
+                            Ver servicios
+                        </span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Lista de servicios -->
+            <div th:if="${not #lists.isEmpty(servicios)}">
+                <div th:if="${categoriaSeleccionada != null}"
+                     class="d-flex align-items-center justify-content-between mb-4">
+                    <h2 style="font-size:1.1rem;font-weight:700;color:var(--neutral-900);margin:0">
+                        <span th:text="${#lists.size(servicios)}">0</span> servicios disponibles
+                    </h2>
+                    <a th:href="@{/map}" class="btn btn-sm btn-outline-primary rounded-pill">
+                        <i class="fas fa-map-marked-alt me-1"></i> Ver en mapa
+                    </a>
+                </div>
+                <div class="service-grid">
+                    <a th:each="s : ${servicios}"
+                       th:href="@{/map}"
+                       class="service-card">
+                        <div class="service-card__img">
+                            <img th:if="${s.imagenUrl != null}"
+                                 th:src="${s.imagenUrl}"
+                                 th:alt="${s.nombre}">
+                            <div th:if="${s.imagenUrl == null}" class="service-card__img-placeholder">
+                                <i class="fas fa-tools"></i>
+                            </div>
+                        </div>
+                        <div class="service-card__body">
+                            <div class="service-card__cat"
+                                 th:text="${s.categoria != null} ? ${s.categoria.nombre} : ''"></div>
+                            <div class="service-card__name" th:text="${s.nombre}">Servicio</div>
+                            <p class="service-card__desc" th:text="${s.descripcion}"></p>
+                        </div>
+                        <div class="service-card__footer">
+                            <div class="service-card__price">
+                                <span th:if="${s.precioEstimado != null}"
+                                      th:text="'$' + ${#numbers.formatDecimal(s.precioEstimado,1,'COMMA',0,'POINT')}">
+                                </span>
+                                <span th:if="${s.precioEstimado == null}" style="color:var(--text-secondary);font-weight:400;font-size:0.875rem">
+                                    Precio a convenir
+                                </span>
+                                <small th:if="${s.precioEstimado != null}"> / hora</small>
+                            </div>
+                            <span class="service-card__cta">
+                                Ver profesionales <i class="fas fa-arrow-right"></i>
+                            </span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Empty state -->
+            <div th:if="${#lists.isEmpty(servicios) and categoriaSeleccionada != null}" class="empty-state">
+                <div class="empty-state__icon"><i class="fas fa-tools"></i></div>
+                <h3>Sin servicios en esta categoría</h3>
+                <p>Aún no hay servicios registrados aquí. Prueba con otra categoría.</p>
+                <a th:href="@{/especialidades}" class="btn btn-primary rounded-pill mt-2">
+                    <i class="fas fa-arrow-left me-1"></i> Ver todas
+                </a>
+            </div>
+
+            <!-- Empty: sin categorías ni servicios -->
+            <div th:if="${#lists.isEmpty(categorias) and #lists.isEmpty(servicios)}" class="empty-state">
+                <div class="empty-state__icon"><i class="fas fa-hard-hat"></i></div>
+                <h3>Próximamente</h3>
+                <p>Estamos incorporando nuestras especialidades. Vuelve pronto.</p>
+                <a th:href="@{/}" class="btn btn-primary rounded-pill mt-2">
+                    <i class="fas fa-home me-1"></i> Ir al inicio
+                </a>
+            </div>
+
+        </div>
+    </main>
+
+    <div th:replace="~{fragments/layout :: footer}"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <div th:replace="~{fragments/layout :: navbarJs}"></div>
+</body>
+</html>
