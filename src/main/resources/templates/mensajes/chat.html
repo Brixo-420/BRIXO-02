@@ -16,7 +16,7 @@
     </style>
 </head>
 <body class="bg-light d-flex flex-column min-vh-100">
-    <div th:replace="~{fragments/layout :: navbar}"></div>
+    <div th:replace="~{fragments/layout :: navbar(overlay=false)}"></div>
 
     <div class="container py-4" style="max-width:700px">
         <a th:href="@{/mensajes}" class="btn btn-sm btn-outline-secondary rounded-pill mb-3">

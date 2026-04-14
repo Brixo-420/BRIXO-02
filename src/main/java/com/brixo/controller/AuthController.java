@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import java.util.regex.Pattern;
 
 @Controller
 public class AuthController {
@@ -42,9 +43,23 @@ public class AuthController {
     public String register(@RequestParam String nombre,
                            @RequestParam String correo,
                            @RequestParam String contrasena,
+                           @RequestParam String confirmar,
                            @RequestParam String telefono,
                            @RequestParam String ciudad,
                            RedirectAttributes ra) {
+
+        // Validar que las contraseñas coincidan
+        if (!contrasena.equals(confirmar)) {
+            ra.addFlashAttribute("error", "Las contraseñas no coinciden.");
+            return "redirect:/register";
+        }
+
+        // Validar requisitos de contraseña
+        String passwordError = validatePassword(contrasena);
+        if (passwordError != null) {
+            ra.addFlashAttribute("error", passwordError);
+            return "redirect:/register";
+        }
 
         if (clienteRepo.existsByCorreo(correo) || contratistaRepo.existsByCorreo(correo)) {
             ra.addFlashAttribute("error", "El correo ya está registrado.");
@@ -61,5 +76,21 @@ public class AuthController {
 
         ra.addFlashAttribute("success", "Cuenta creada. Inicia sesión.");
         return "redirect:/login";
+    }
+
+    private String validatePassword(String password) {
+        if (password == null || password.length() < 8) {
+            return "La contraseña debe tener al menos 8 caracteres.";
+        }
+        if (!Pattern.compile("[A-Z]").matcher(password).find()) {
+            return "La contraseña debe contener al menos una letra mayúscula.";
+        }
+        if (!Pattern.compile("[a-z]").matcher(password).find()) {
+            return "La contraseña debe contener al menos una letra minúscula.";
+        }
+        if (!Pattern.compile("[0-9]").matcher(password).find()) {
+            return "La contraseña debe contener al menos un número.";
+        }
+        return null;
     }
 }

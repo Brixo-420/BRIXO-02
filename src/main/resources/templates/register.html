@@ -30,8 +30,42 @@
                 <input type="email" name="correo" class="form-control" required>
             </div>
             <div class="mb-3">
-                <label class="form-label fw-semibold">Contraseña</label>
-                <input type="password" name="contrasena" class="form-control" required minlength="8">
+                <label for="contrasena" class="form-label fw-semibold">Contraseña</label>
+                <div class="input-group mb-2">
+                    <input type="password" id="contrasena" name="contrasena" class="form-control" required minlength="8" placeholder="Mínimo 8 caracteres">
+                    <button class="btn btn-outline-secondary" type="button" id="togglePassword" aria-label="Mostrar/ocultar contraseña">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+                <small class="text-muted d-block mb-2">La contraseña debe tener al menos 8 caracteres</small>
+                <div id="passwordRequirements" class="small">
+                    <div class="mb-1">
+                        <i class="fas fa-circle" id="req-length" style="color:#ddd;"></i>
+                        <span>Mínimo 8 caracteres</span>
+                    </div>
+                    <div class="mb-1">
+                        <i class="fas fa-circle" id="req-upper" style="color:#ddd;"></i>
+                        <span>Una letra mayúscula</span>
+                    </div>
+                    <div class="mb-1">
+                        <i class="fas fa-circle" id="req-lower" style="color:#ddd;"></i>
+                        <span>Una letra minúscula</span>
+                    </div>
+                    <div>
+                        <i class="fas fa-circle" id="req-number" style="color:#ddd;"></i>
+                        <span>Un número</span>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="confirmar" class="form-label fw-semibold">Confirmar contraseña</label>
+                <div class="input-group">
+                    <input type="password" id="confirmar" name="confirmar" class="form-control" required minlength="8" placeholder="Repite tu contraseña">
+                    <button class="btn btn-outline-secondary" type="button" id="toggleConfirm" aria-label="Mostrar/ocultar contraseña">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+                <small id="matchMessage" class="d-block mt-1"></small>
             </div>
             <div class="mb-3">
                 <label class="form-label fw-semibold">Teléfono</label>
@@ -51,5 +85,92 @@
         </p>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const passwordInput = document.getElementById('contrasena');
+        const confirmInput = document.getElementById('confirmar');
+        const togglePassword = document.getElementById('togglePassword');
+        const toggleConfirm = document.getElementById('toggleConfirm');
+        const matchMessage = document.getElementById('matchMessage');
+        const form = document.querySelector('form');
+
+        // Toggle password visibility
+        function toggleInputType(inputId, buttonId) {
+            document.getElementById(buttonId).addEventListener('click', function() {
+                const input = document.getElementById(inputId);
+                const icon = this.querySelector('i');
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    input.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            });
+        }
+
+        toggleInputType('contrasena', 'togglePassword');
+        toggleInputType('confirmar', 'toggleConfirm');
+
+        // Validate password requirements
+        function validatePassword(password) {
+            const requirements = {
+                length: password.length >= 8,
+                upper: /[A-Z]/.test(password),
+                lower: /[a-z]/.test(password),
+                number: /\d/.test(password)
+            };
+
+            document.getElementById('req-length').style.color = requirements.length ? '#198754' : '#ddd';
+            document.getElementById('req-upper').style.color = requirements.upper ? '#198754' : '#ddd';
+            document.getElementById('req-lower').style.color = requirements.lower ? '#198754' : '#ddd';
+            document.getElementById('req-number').style.color = requirements.number ? '#198754' : '#ddd';
+
+            return Object.values(requirements).every(Boolean);
+        }
+
+        // Check if passwords match
+        function checkPasswordMatch() {
+            if (passwordInput.value === '' && confirmInput.value === '') {
+                matchMessage.textContent = '';
+                matchMessage.className = 'd-block mt-1';
+                return true;
+            }
+
+            if (passwordInput.value === confirmInput.value) {
+                matchMessage.textContent = '✓ Las contraseñas coinciden';
+                matchMessage.className = 'd-block mt-1 text-success';
+                return true;
+            } else {
+                matchMessage.textContent = '✗ Las contraseñas no coinciden';
+                matchMessage.className = 'd-block mt-1 text-danger';
+                return false;
+            }
+        }
+
+        // Event listeners
+        passwordInput.addEventListener('input', () => {
+            validatePassword(passwordInput.value);
+            checkPasswordMatch();
+        });
+
+        confirmInput.addEventListener('input', checkPasswordMatch);
+
+        // Validate on form submit
+        form.addEventListener('submit', function(e) {
+            const passwordValid = validatePassword(passwordInput.value);
+            const passwordsMatch = checkPasswordMatch();
+
+            if (!passwordValid || !passwordsMatch) {
+                e.preventDefault();
+                if (!passwordValid) {
+                    alert('Por favor, cumple con todos los requisitos de contraseña');
+                } else {
+                    alert('Las contraseñas no coinciden');
+                }
+            }
+        });
+    </script>
 </body>
 </html>
