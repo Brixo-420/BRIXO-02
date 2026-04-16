@@ -1,6 +1,7 @@
 package com.brixo.controller;
 
 import com.brixo.model.Cliente;
+
 import com.brixo.repository.ClienteRepository;
 import com.brixo.repository.ContratistaRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
